@@ -11,22 +11,21 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --black:      #000000;
-  --t1:         #1c1c1e;
-  --t2:         #2c2c2e;
-  --t3:         #3a3a3c;
-  --white:      #ffffff;
-  --muted:      #ebebf5;
-  --hint:       rgba(235,235,245,0.6);
-  --hint2:      rgba(235,235,245,0.3);
-  --sep:        rgba(84,84,88,0.65);
-  --blue:       #0a84ff;
-  --red:        #ff453a;
-  --green:      #30d158;
-  --yellow:     #ffd60a;
-  --safe-top:   env(safe-area-inset-top, 44px);
-  --safe-bot:   env(safe-area-inset-bottom, 34px);
-  --nav-h:      44px;
+  --black:   #000000;
+  --t1:      #1c1c1e;
+  --t2:      #2c2c2e;
+  --white:   #ffffff;
+  --hint:    rgba(235,235,245,0.5);
+  --hint2:   rgba(235,235,245,0.25);
+  --sep:     rgba(84,84,88,0.55);
+  --blue:    #0a84ff;
+  --red:     #ff453a;
+  --green:   #30d158;
+  --yellow:  #ffd60a;
+  --safe-top: env(safe-area-inset-top, 44px);
+  --safe-bot: env(safe-area-inset-bottom, 34px);
+  --nav-h:   44px;
+  --bar-h:   28px;
 }
 
 html, body {
@@ -38,126 +37,111 @@ html, body {
 }
 
 body {
-  padding-top: calc(var(--safe-top) + var(--nav-h) + 40px); /* nav + compact progress bar */
-  padding-bottom: calc(var(--safe-bot) + 72px);
+  padding-top: calc(var(--safe-top) + var(--nav-h) + var(--bar-h));
+  padding-bottom: calc(var(--safe-bot) + 64px);
   overflow-x: hidden;
 }
 
-/* ─── NAV ─── */
+/* NAV */
 .nav {
   position: fixed; top: 0; left: 0; right: 0; z-index: 300;
   padding-top: var(--safe-top);
-  background: rgba(28,28,30,0.85);
+  background: rgba(0,0,0,0.9);
   backdrop-filter: saturate(180%) blur(20px);
   -webkit-backdrop-filter: saturate(180%) blur(20px);
-  border-bottom: 0.5px solid var(--sep);
 }
 .nav-inner {
   height: var(--nav-h);
   display: flex; align-items: center; justify-content: space-between;
   padding: 0 20px;
+  border-bottom: 0.5px solid var(--sep);
 }
-.nav-title {
-  font-size: 17px; font-weight: 600; letter-spacing: -0.41px;
-  color: var(--white);
-}
-.nav-sub { font-size: 13px; font-weight: 400; letter-spacing: -0.08px; color: var(--hint); }
+.nav-title { font-size: 17px; font-weight: 600; letter-spacing: -0.41px; color: var(--white); }
+.nav-step  { font-size: 13px; font-weight: 400; letter-spacing: -0.08px; color: var(--hint); }
 
-/* ─── COMPACT PROGRESS BAR ─── */
-.progress-bar {
+/* PROGRESS MICRO BAR */
+.pbar {
   position: fixed;
   top: calc(var(--safe-top) + var(--nav-h));
-  left: 0; right: 0; z-index: 200;
-  height: 40px;
-  background: rgba(28,28,30,0.92);
+  left: 0; right: 0; z-index: 299;
+  height: var(--bar-h);
+  background: rgba(0,0,0,0.9);
   backdrop-filter: saturate(180%) blur(20px);
   -webkit-backdrop-filter: saturate(180%) blur(20px);
   border-bottom: 0.5px solid var(--sep);
   display: flex; align-items: center;
-  padding: 0 20px; gap: 12px;
+  padding: 0 20px; gap: 10px;
 }
-.pb-ring { flex-shrink: 0; }
-svg.ring { transform: rotate(-90deg); display: block; }
-.ring-bg { fill: none; stroke: var(--t3); }
-.ring-fill {
-  fill: none; stroke: var(--blue);
-  stroke-linecap: round;
-  transition: stroke-dashoffset 0.5s cubic-bezier(0.4,0,0.2,1);
+.pbar-dots { display: flex; gap: 5px; align-items: center; }
+.pdot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--hint2);
+  transition: background 0.3s, transform 0.3s;
 }
-.pb-pct {
-  font-size: 13px; font-weight: 600; letter-spacing: -0.08px;
-  color: var(--white); min-width: 34px;
-  font-variant-numeric: tabular-nums;
+.pdot.active { background: var(--blue); transform: scale(1.3); }
+.pdot.done   { background: var(--green); }
+.pbar-label  { font-size: 11px; color: var(--hint); letter-spacing: -0.07px; flex: 1; }
+.pbar-pct    {
+  font-size: 11px; font-weight: 600; letter-spacing: -0.07px;
+  color: var(--hint); font-variant-numeric: tabular-nums;
 }
-.pb-track-wrap { flex: 1; display: flex; flex-direction: column; gap: 4px; }
-.pb-track {
-  height: 3px; background: var(--t3); border-radius: 2px; overflow: hidden;
-  position: relative;
-}
-.pb-fill {
-  height: 100%; border-radius: 2px;
-  background: var(--blue);
-  transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
-  width: 0%;
-}
-.pb-count { font-size: 11px; color: var(--hint2); letter-spacing: -0.07px; }
+.pbar-track  { width: 48px; height: 2px; background: var(--sep); border-radius: 1px; overflow: hidden; }
+.pbar-fill   { height: 100%; background: var(--blue); border-radius: 1px; transition: width 0.4s cubic-bezier(0.4,0,0.2,1); width: 0%; }
 
-/* ─── WARN ─── */
-.warn-band {
-  background: rgba(255,69,58,0.1);
-  padding: 12px 20px;
-  display: flex; align-items: flex-start; gap: 10px;
-  border-bottom: 0.5px solid rgba(255,69,58,0.2);
-}
-.warn-text { font-size: 13px; font-weight: 400; letter-spacing: -0.08px; color: var(--red); line-height: 1.4; }
+/* PAGES */
+.page { display: none; animation: fadeIn 0.22s ease; }
+.page.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateX(12px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes fadeBack { from { opacity: 0; transform: translateX(-12px); } to { opacity: 1; transform: translateX(0); } }
+.page.back { animation: fadeBack 0.22s ease; }
 
-/* ─── OEUVRES ─── */
-.oeuvres-wrap { background: var(--t1); padding: 16px 0 20px; }
-.section-eyebrow {
-  font-size: 13px; font-weight: 400; letter-spacing: -0.08px; color: var(--hint);
-  padding: 0 20px; margin-bottom: 12px;
-}
-.oeuvres-scroll {
-  display: flex; gap: 10px;
-  padding: 0 20px;
-  overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none;
-}
-.oeuvres-scroll::-webkit-scrollbar { display: none; }
-.oeuvre-card {
-  flex-shrink: 0; width: 136px;
-  background: var(--t2); border-radius: 12px;
-  padding: 13px 13px 14px;
-}
-.oeuvre-name {
-  font-size: 13px; font-weight: 600; letter-spacing: -0.08px;
-  color: var(--white); margin-bottom: 5px; line-height: 1.3;
-}
-.oeuvre-desc { font-size: 11px; font-weight: 400; letter-spacing: -0.07px; line-height: 1.45; color: var(--hint); }
+/* PAGE HEADER */
+.page-header { padding: 28px 20px 6px; }
+.page-eyebrow { font-size: 12px; font-weight: 400; letter-spacing: 0.04em; text-transform: uppercase; color: var(--hint); margin-bottom: 6px; }
+.page-title   { font-size: 28px; font-weight: 700; letter-spacing: -0.56px; color: var(--white); line-height: 1.1; }
+.page-subtitle { font-size: 15px; font-weight: 400; letter-spacing: -0.24px; color: var(--hint); margin-top: 6px; }
 
-/* ─── GROUP HEADER ─── */
-.group { background: var(--black); }
-.group-header {
-  display: flex; align-items: center; gap: 10px;
-  padding: 22px 20px 8px;
+/* TRAJET CARD */
+.trajet-card {
+  margin: 20px 20px 0;
+  background: var(--t1);
+  border-radius: 14px;
+  overflow: hidden;
 }
-.gdot { width: 7px; height: 7px; border-radius: 50%; background: var(--white); flex-shrink: 0; }
-.gdot-dim { background: var(--hint2); }
-.gdot-blue { background: var(--blue); }
-.g-time { font-size: 13px; font-weight: 400; letter-spacing: -0.08px; color: var(--hint); white-space: nowrap; }
-.g-name { font-size: 17px; font-weight: 600; letter-spacing: -0.41px; color: var(--white); flex: 1; }
+.trajet-body  { display: flex; align-items: stretch; }
+.trajet-from, .trajet-to { flex: 1; padding: 14px 15px; }
+.trajet-from  { border-right: 0.5px solid var(--sep); }
+.tloc-label   { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--hint2); margin-bottom: 3px; }
+.tloc-name    { font-size: 14px; font-weight: 600; letter-spacing: -0.18px; color: var(--white); line-height: 1.3; }
+.tloc-sub     { font-size: 11px; color: var(--hint); margin-top: 2px; }
+.trajet-mid   { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0 14px; gap: 4px; flex-shrink: 0; }
+.trajet-icon  { font-size: 20px; line-height: 1; }
+.tbadge       { font-size: 10px; text-transform: uppercase; letter-spacing: 0.04em; padding: 2px 8px; border-radius: 999px; white-space: nowrap; }
+.tbadge-metro { background: rgba(10,132,255,0.15); color: var(--blue); }
+.tbadge-uber  { background: rgba(48,209,88,0.12); color: var(--green); }
+.trajet-note  { padding: 9px 16px; border-top: 0.5px solid var(--sep); font-size: 12px; color: var(--hint); }
 
-/* ─── BAG BLOCK ─── */
-.bag-block { background: var(--t1); margin: 0 0 1px; }
-.bag-head {
-  display: flex; align-items: center; gap: 8px;
-  padding: 12px 20px 10px;
-  border-bottom: 0.5px solid var(--sep);
+/* WARN */
+.warn {
+  margin: 16px 20px 0;
+  padding: 10px 14px;
+  background: rgba(255,69,58,0.08);
+  border: 0.5px solid rgba(255,69,58,0.2);
+  border-radius: 10px;
+  display: flex; gap: 9px; align-items: flex-start;
 }
-.bag-head-text { font-size: 13px; font-weight: 600; letter-spacing: -0.08px; color: var(--white); }
-.bag-pills { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 20px 16px; }
+.warn-text { font-size: 13px; color: var(--red); line-height: 1.4; letter-spacing: -0.08px; }
+
+/* SECTION LABEL */
+.slabel { font-size: 12px; font-weight: 400; letter-spacing: 0.04em; text-transform: uppercase; color: var(--hint); padding: 22px 20px 8px; }
+
+/* BAG PILLS */
+.bag-wrap  { padding: 0 20px; }
+.bag-title { font-size: 13px; font-weight: 600; letter-spacing: -0.08px; color: var(--hint); margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+.pills     { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
 .pill {
   font-size: 15px; font-weight: 400; letter-spacing: -0.24px;
-  padding: 7px 16px; border-radius: 9999px;
+  padding: 7px 16px; border-radius: 999px;
   border: 1px solid var(--sep);
   color: var(--white); background: transparent;
   cursor: pointer; user-select: none;
@@ -165,43 +149,15 @@ svg.ring { transform: rotate(-90deg); display: block; }
   transition: transform 0.1s, opacity 0.15s;
 }
 .pill:active { transform: scale(0.95); }
-.pill.done { opacity: 0.3; text-decoration: line-through; }
-.pill.critical { border-color: var(--red); color: var(--red); }
-.pill.critical.done { border-color: var(--sep); color: var(--hint2); }
+.pill.done { opacity: 0.28; text-decoration: line-through; }
+.pill.crit { border-color: var(--red); color: var(--red); }
+.pill.crit.done { border-color: var(--sep); color: var(--hint); }
 
-/* ─── TRAJET ─── */
-.trajet { background: var(--t1); margin: 0 0 1px; }
-.trajet-body { display: flex; align-items: stretch; }
-.trajet-from, .trajet-to { flex: 1; padding: 14px 16px; }
-.trajet-from { border-right: 0.5px solid var(--sep); }
-.tloc-label {
-  font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 0.05em;
-  color: var(--hint2); margin-bottom: 4px;
-}
-.tloc-name { font-size: 15px; font-weight: 600; letter-spacing: -0.24px; color: var(--white); line-height: 1.3; }
-.tloc-sub { font-size: 12px; color: var(--hint); margin-top: 2px; letter-spacing: -0.07px; }
-.trajet-mid {
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  padding: 0 14px; gap: 5px; flex-shrink: 0;
-}
-.trajet-icon { font-size: 22px; line-height: 1; }
-.tbadge {
-  font-size: 11px; font-weight: 400; letter-spacing: 0.03em;
-  text-transform: uppercase; padding: 3px 9px; border-radius: 9999px; white-space: nowrap;
-}
-.tbadge-metro { background: rgba(10,132,255,0.18); color: var(--blue); }
-.tbadge-uber  { background: rgba(48,209,88,0.14); color: var(--green); }
-.trajet-note {
-  padding: 9px 20px; border-top: 0.5px solid var(--sep);
-  font-size: 12px; color: var(--hint); letter-spacing: -0.07px;
-  background: rgba(44,44,46,0.6);
-}
-
-/* ─── ITEMS LIST ─── */
-.inset-list { background: var(--t1); }
+/* ITEMS */
+.items-wrap { background: var(--t1); border-radius: 14px; overflow: hidden; margin: 0 20px; }
 .item {
   display: flex; align-items: flex-start; gap: 14px;
-  padding: 13px 20px;
+  padding: 14px 16px;
   border-bottom: 0.5px solid var(--sep);
   cursor: pointer; user-select: none;
   -webkit-tap-highlight-color: transparent;
@@ -210,53 +166,68 @@ svg.ring { transform: rotate(-90deg); display: block; }
 .item:last-child { border-bottom: none; }
 .item:active { background: var(--t2); }
 .item.done .itext { text-decoration: line-through; color: var(--hint2); }
-.check-circle {
+.chk {
   width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0; margin-top: 1px;
-  border: 1.5px solid var(--t3);
-  background: transparent;
+  border: 1.5px solid rgba(84,84,88,0.8);
   display: flex; align-items: center; justify-content: center;
   transition: all 0.18s cubic-bezier(0.4,0,0.2,1);
 }
-.item.done .check-circle { background: var(--blue); border-color: var(--blue); }
-.checkmark { display: none; }
-.item.done .checkmark { display: block; }
-.ibody { flex: 1; display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
-.itext { font-size: 17px; font-weight: 400; letter-spacing: -0.41px; line-height: 1.47; color: var(--white); flex: 1; }
-.itag {
-  font-size: 11px; font-weight: 400; letter-spacing: -0.07px;
-  padding: 3px 9px; border-radius: 9999px; white-space: nowrap;
-  flex-shrink: 0; align-self: flex-start; margin-top: 3px;
-}
-.itag-red    { background: rgba(255,69,58,0.15);  color: var(--red); }
-.itag-blue   { background: rgba(10,132,255,0.15); color: var(--blue); }
-.itag-green  { background: rgba(48,209,88,0.14);  color: var(--green); }
-.itag-yellow { background: rgba(255,214,10,0.14); color: var(--yellow); }
+.item.done .chk { background: var(--blue); border-color: var(--blue); }
+.ckmark { display: none; }
+.item.done .ckmark { display: block; }
+.ibody  { flex: 1; display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.itext  { font-size: 17px; font-weight: 400; letter-spacing: -0.41px; line-height: 1.47; color: var(--white); flex: 1; }
+.itag   { font-size: 11px; padding: 3px 9px; border-radius: 999px; white-space: nowrap; flex-shrink: 0; align-self: flex-start; margin-top: 3px; }
+.itag-r { background: rgba(255,69,58,0.12);  color: var(--red); }
+.itag-b { background: rgba(10,132,255,0.12); color: var(--blue); }
+.itag-g { background: rgba(48,209,88,0.12);  color: var(--green); }
+.itag-y { background: rgba(255,214,10,0.12); color: var(--yellow); }
 
-/* ─── BOTTOM ─── */
+/* OEUVRES */
+.oeuvres-scroll {
+  display: flex; gap: 10px; padding: 0 20px;
+  overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none;
+}
+.oeuvres-scroll::-webkit-scrollbar { display: none; }
+.oc {
+  flex-shrink: 0; width: 130px;
+  background: var(--t1); border-radius: 12px; padding: 13px 13px 14px;
+}
+.oc-name { font-size: 13px; font-weight: 600; letter-spacing: -0.08px; color: var(--white); margin-bottom: 4px; line-height: 1.3; }
+.oc-desc { font-size: 11px; color: var(--hint); line-height: 1.45; letter-spacing: -0.07px; }
+
+/* BOTTOM NAV */
 .bottom {
   position: fixed; bottom: 0; left: 0; right: 0; z-index: 300;
-  background: rgba(28,28,30,0.88);
+  background: rgba(0,0,0,0.92);
   backdrop-filter: saturate(180%) blur(20px);
   -webkit-backdrop-filter: saturate(180%) blur(20px);
   border-top: 0.5px solid var(--sep);
-  padding: 12px 20px calc(12px + var(--safe-bot));
+  padding: 10px 20px calc(10px + var(--safe-bot));
   display: flex; align-items: center; justify-content: space-between; gap: 12px;
 }
-.bot-left {}
-.bot-sublabel { font-size: 12px; color: var(--hint); letter-spacing: -0.07px; }
-.bot-count { font-size: 17px; font-weight: 600; letter-spacing: -0.41px; color: var(--white); }
-.reset-btn {
-  font-family: -apple-system, "SF Pro Text", system-ui, sans-serif;
-  font-size: 15px; font-weight: 400; letter-spacing: -0.24px;
-  padding: 9px 20px; border-radius: 9999px;
-  border: 1px solid var(--sep);
-  background: transparent; color: var(--blue);
-  cursor: pointer; -webkit-tap-highlight-color: transparent;
-  transition: transform 0.1s;
+.btn-back {
+  font-family: -apple-system, sans-serif;
+  font-size: 17px; font-weight: 400; letter-spacing: -0.41px;
+  color: var(--blue); background: transparent; border: none;
+  cursor: pointer; padding: 4px 0; min-width: 60px;
+  -webkit-tap-highlight-color: transparent;
 }
-.reset-btn:active { transform: scale(0.95); background: rgba(255,255,255,0.05); }
+.btn-back:active { opacity: 0.6; }
+.btn-next {
+  font-family: -apple-system, sans-serif;
+  font-size: 17px; font-weight: 400; letter-spacing: -0.41px;
+  background: var(--blue); color: var(--white);
+  border: none; border-radius: 999px;
+  padding: 11px 28px; cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.1s, opacity 0.15s;
+}
+.btn-next:active   { transform: scale(0.96); }
+.btn-next.disabled { opacity: 0.3; pointer-events: none; }
+.btn-next.final    { background: var(--green); }
 
-.spacer { height: 32px; }
+.spacer { height: 24px; }
 </style>
 </head>
 <body>
@@ -264,199 +235,313 @@ svg.ring { transform: rotate(-90deg); display: block; }
 <!-- NAV -->
 <nav class="nav">
   <div class="nav-inner">
-    <span class="nav-title">Exposition Lola</span>
-    <span class="nav-sub" id="nav-date"></span>
+    <span class="nav-title">Expo Lola</span>
+    <span class="nav-step" id="nav-step">1 / 5</span>
   </div>
 </nav>
 
-<!-- COMPACT PROGRESS BAR -->
-<div class="progress-bar" id="progress-bar">
-  <div class="pb-ring">
-    <svg class="ring" width="24" height="24" viewBox="0 0 24 24">
-      <circle class="ring-bg" cx="12" cy="12" r="9" stroke-width="2.5"/>
-      <circle class="ring-fill" id="ring-fill" cx="12" cy="12" r="9" stroke-width="2.5"
-        stroke-dasharray="56.5" stroke-dashoffset="56.5"/>
-    </svg>
+<!-- MICRO PROGRESS BAR -->
+<div class="pbar">
+  <div class="pbar-dots" id="pbar-dots">
+    <div class="pdot active" data-i="0"></div>
+    <div class="pdot" data-i="1"></div>
+    <div class="pdot" data-i="2"></div>
+    <div class="pdot" data-i="3"></div>
+    <div class="pdot" data-i="4"></div>
   </div>
-  <span class="pb-pct" id="pb-pct">0%</span>
-  <div class="pb-track-wrap">
-    <div class="pb-track"><div class="pb-fill" id="pb-fill"></div></div>
-    <span class="pb-count" id="pb-count">0 / 0 tâches</span>
-  </div>
+  <span class="pbar-label" id="pbar-label">Préparation</span>
+  <span class="pbar-pct" id="pbar-pct">0%</span>
+  <div class="pbar-track"><div class="pbar-fill" id="pbar-fill"></div></div>
 </div>
 
-<!-- WARN -->
-<div class="warn-band">
-  <span style="font-size:14px;flex-shrink:0;margin-top:1px;">⚠️</span>
-  <span class="warn-text">Œuvres extrêmement fragiles — aigrettes de pissenlit. Pas de vent, pas de choc.</span>
+<!-- ═══════════════════════════════════ PAGE 1 — PRÉPARATION -->
+<div class="page active" id="p0" data-label="Préparation">
+
+  <div class="page-header">
+    <div class="page-eyebrow">8h00 · Réveil</div>
+    <div class="page-title">Préparer les sacs</div>
+    <div class="page-subtitle">Départ 8h50 en métro</div>
+  </div>
+
+  <div class="slabel">🟢 Tote bag Yves Rocher vert</div>
+  <div class="bag-wrap">
+    <div class="pills" id="pills-0">
+      <span class="pill" onclick="togglePill(this,0)">Ciseaux</span>
+      <span class="pill" onclick="togglePill(this,0)">Pâte à fixe</span>
+      <span class="pill" onclick="togglePill(this,0)">Chiffons propres</span>
+      <span class="pill" onclick="togglePill(this,0)">Produit vitres</span>
+      <span class="pill" onclick="togglePill(this,0)">Scotch</span>
+      <span class="pill" onclick="togglePill(this,0)">Double face</span>
+      <span class="pill" onclick="togglePill(this,0)">Multiprise</span>
+      <span class="pill crit" onclick="togglePill(this,0)">Clé USB Bâtons de pluies</span>
+      <span class="pill" onclick="togglePill(this,0)">Sac de courses (vide)</span>
+    </div>
+  </div>
+
+  <div class="trajet-card">
+    <div class="trajet-body">
+      <div class="trajet-from"><div class="tloc-label">Départ</div><div class="tloc-name">Chez Lola</div></div>
+      <div class="trajet-mid"><div class="trajet-icon">🚇</div><div class="tbadge tbadge-metro">Métro</div></div>
+      <div class="trajet-to"><div class="tloc-label">Arrivée</div><div class="tloc-name">Résidence Bouchor</div><div class="tloc-sub">9h30</div></div>
+    </div>
+    <div class="trajet-note">Tote bag vert + sac de courses vide</div>
+  </div>
+
+  <div class="spacer"></div>
 </div>
 
-<!-- OEUVRES -->
-<div class="oeuvres-wrap">
-  <div class="section-eyebrow">Les 4 œuvres</div>
+<!-- ═══════════════════════════════════ PAGE 2 — BOUCHOR -->
+<div class="page" id="p1" data-label="Bouchor">
+
+  <div class="page-header">
+    <div class="page-eyebrow">9h30 · Résidence Bouchor</div>
+    <div class="page-title">Charger le matériel</div>
+  </div>
+
+  <div class="slabel">🛍 Sac de courses — à récupérer ici</div>
+  <div class="bag-wrap">
+    <div class="pills" id="pills-1">
+      <span class="pill" onclick="togglePill(this,1)">Marteau + clous</span>
+      <span class="pill" onclick="togglePill(this,1)">Enduit + pinceau</span>
+      <span class="pill" onclick="togglePill(this,1)">Planche à découper</span>
+      <span class="pill" onclick="togglePill(this,1)">Règles + cutters</span>
+      <span class="pill" onclick="togglePill(this,1)">Gaffer blanc</span>
+      <span class="pill" onclick="togglePill(this,1)">Serpillière</span>
+    </div>
+  </div>
+
+  <div class="slabel">À charger dans le van</div>
+  <div class="items-wrap" id="items-1">
+    <div class="item" onclick="toggleItem(this,1)"><div class="chk"><svg class="ckmark" width="11" height="11" viewBox="0 0 11 11" fill="none"><polyline points="2,5.5 4.5,8.5 9,2.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ibody"><span class="itext">3 socles blancs + bâche de protection</span><span class="itag itag-y">Peinture</span></div></div>
+    <div class="item" onclick="toggleItem(this,1)"><div class="chk"><svg class="ckmark" width="11" height="11" viewBox="0 0 11 11" fill="none"><polyline points="2,5.5 4.5,8.5 9,2.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ibody"><span class="itext">Écran + alimentation</span></div></div>
+    <div class="item" onclick="toggleItem(this,1)"><div class="chk"><svg class="ckmark" width="11" height="11" viewBox="0 0 11 11" fill="none"><polyline points="2,5.5 4.5,8.5 9,2.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ibody"><span class="itext">Petite table blanche cassée</span></div></div>
+    <div class="item" onclick="toggleItem(this,1)"><div class="chk"><svg class="ckmark" width="11" height="11" viewBox="0 0 11 11" fill="none"><polyline points="2,5.5 4.5,8.5 9,2.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ibody"><span class="itext">Voir ce qu'Ada amène — si trop : 2 Uber</span><span class="itag itag-b">Coord.</span></div></div>
+  </div>
+
+  <div style="margin-top: 20px;">
+  <div class="trajet-card">
+    <div class="trajet-body">
+      <div class="trajet-from"><div class="tloc-label">Départ</div><div class="tloc-name">Résidence Bouchor</div></div>
+      <div class="trajet-mid"><div class="trajet-icon">🚐</div><div class="tbadge tbadge-uber">Uber Van</div></div>
+      <div class="trajet-to"><div class="tloc-label">Arrivée</div><div class="tloc-name">55 rue du Montparnasse</div><div class="tloc-sub">~10h30</div></div>
+    </div>
+    <div class="trajet-note">Socles + écran + table dans le coffre</div>
+  </div>
+  </div>
+
+  <div class="spacer"></div>
+</div>
+
+<!-- ═══════════════════════════════════ PAGE 3 — GALERIE 1er PASSAGE -->
+<div class="page" id="p2" data-label="Galerie">
+
+  <div class="page-header">
+    <div class="page-eyebrow">10h30 / 11h · Galerie Montparnasse</div>
+    <div class="page-title">1er passage</div>
+    <div class="page-subtitle">Socles + écran</div>
+  </div>
+
+  <div class="slabel">À faire</div>
+  <div class="items-wrap" id="items-2">
+    <div class="item" onclick="toggleItem(this,2)"><div class="chk"><svg class="ckmark" width="11" height="11" viewBox="0 0 11 11" fill="none"><polyline points="2,5.5 4.5,8.5 9,2.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ibody"><span class="itext">Déposer et positionner les socles</span></div></div>
+    <div class="item" onclick="toggleItem(this,2)"><div class="chk"><svg class="ckmark" width="11" height="11" viewBox="0 0 11 11" fill="none"><polyline points="2,5.5 4.5,8.5 9,2.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ibody"><span class="itext">Nettoyer sol + vitres</span></div></div>
+    <div class="item" onclick="toggleItem(this,2)"><div class="chk"><svg class="ckmark" width="11" height="11" viewBox="0 0 11 11" fill="none"><polyline points="2,5.5 4.5,8.5 9,2.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ibody"><span class="itext">Installer écran + clé USB + tester son et image</span><span class="itag itag-r">Test</span></div></div>
+    <div class="item" onclick="toggleItem(this,2)"><div class="chk"><svg class="ckmark" width="11" height="11" viewBox="0 0 11 11" fill="none"><polyline points="2,5.5 4.5,8.5 9,2.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ibody"><span class="itext">Si ça ne fonctionne pas : retour 13 passage Courtois 75011</span><span class="itag itag-b">Plan B</span></div></div>
+  </div>
+
+  <div style="margin-top: 20px;">
+  <div class="trajet-card">
+    <div class="trajet-body">
+      <div class="trajet-from"><div class="tloc-label">Départ</div><div class="tloc-name">Galerie</div></div>
+      <div class="trajet-mid"><div class="trajet-icon">🚗</div><div class="tbadge tbadge-uber">Uber</div></div>
+      <div class="trajet-to"><div class="tloc-label">Arrivée</div><div class="tloc-name">Chez Lola</div><div class="tloc-sub">Récupérer les œuvres</div></div>
+    </div>
+    <div class="trajet-note">Vérifier chaque boîte plexiglas avant de partir</div>
+  </div>
+  </div>
+
+  <div class="spacer"></div>
+</div>
+
+<!-- ═══════════════════════════════════ PAGE 4 — RÉCUPÉRER LES OEUVRES -->
+<div class="page" id="p3" data-label="Œuvres">
+
+  <div class="warn" style="margin-top: 20px;">
+    <span style="font-size:14px;flex-shrink:0;">⚠️</span>
+    <span class="warn-text">Extrêmement fragile — aigrettes de pissenlit. Pas de vent, pas de choc.</span>
+  </div>
+
+  <div class="page-header" style="padding-top: 18px;">
+    <div class="page-eyebrow">Chez Lola</div>
+    <div class="page-title">Récupérer les œuvres</div>
+  </div>
+
+  <div class="slabel">Les 4 œuvres</div>
   <div class="oeuvres-scroll">
-    <div class="oeuvre-card"><div class="oeuvre-name">Le nuage de sol</div><div class="oeuvre-desc">Caillou + pissenlits, boîte plexiglas 10×10 cm</div></div>
-    <div class="oeuvre-card"><div class="oeuvre-name">Carré de verre</div><div class="oeuvre-desc">Verre + papier + pissenlits, grande boîte 30×30 cm</div></div>
-    <div class="oeuvre-card"><div class="oeuvre-name">Retenir le ciel</div><div class="oeuvre-desc">Plaques de verre superposées, 15×5×10 cm</div></div>
-    <div class="oeuvre-card"><div class="oeuvre-name">Bâtons de pluies</div><div class="oeuvre-desc">Écran TV + clé USB, son direct</div></div>
+    <div class="oc"><div class="oc-name">Le nuage de sol</div><div class="oc-desc">Caillou + pissenlits, plexiglas 10×10 cm</div></div>
+    <div class="oc"><div class="oc-name">Carré de verre</div><div class="oc-desc">Verre + papier + pissenlits, 30×30 cm</div></div>
+    <div class="oc"><div class="oc-name">Retenir le ciel</div><div class="oc-desc">Plaques de verre superposées, 15×5×10 cm</div></div>
+    <div class="oc"><div class="oc-name">Bâtons de pluies</div><div class="oc-desc">Déjà installé à la galerie</div></div>
   </div>
-</div>
 
-<!-- 8H — REVEIL -->
-<div class="group" data-group="0">
-  <div class="group-header"><div class="gdot"></div><span class="g-time">8h00</span><span class="g-name">Réveil — préparer les sacs</span></div>
-  <div class="bag-block">
-    <div class="bag-head"><span style="font-size:15px;">🟢</span><span class="bag-head-text">Tote bag Yves Rocher vert</span></div>
-    <div class="bag-pills">
-      <span class="pill" onclick="togglePill(this)">Ciseaux</span>
-      <span class="pill" onclick="togglePill(this)">Pâte à fixe</span>
-      <span class="pill" onclick="togglePill(this)">Chiffons propres</span>
-      <span class="pill" onclick="togglePill(this)">Produit vitres</span>
-      <span class="pill" onclick="togglePill(this)">Scotch</span>
-      <span class="pill" onclick="togglePill(this)">Double face</span>
-      <span class="pill" onclick="togglePill(this)">Multiprise</span>
-      <span class="pill critical" onclick="togglePill(this)">Clé USB Bâtons de pluies !</span>
-      <span class="pill" onclick="togglePill(this)">Sac de courses (vide)</span>
+  <div class="slabel">Avant de partir</div>
+  <div class="items-wrap" id="items-3">
+    <div class="item" onclick="toggleItem(this,3)"><div class="chk"><svg class="ckmark" width="11" height="11" viewBox="0 0 11 11" fill="none"><polyline points="2,5.5 4.5,8.5 9,2.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ibody"><span class="itext">Vérifier chaque boîte plexiglas</span><span class="itag itag-r">Fragile</span></div></div>
+    <div class="item" onclick="toggleItem(this,3)"><div class="chk"><svg class="ckmark" width="11" height="11" viewBox="0 0 11 11" fill="none"><polyline points="2,5.5 4.5,8.5 9,2.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ibody"><span class="itext">Scotch de maintien bien en place sur socles</span></div></div>
+    <div class="item" onclick="toggleItem(this,3)"><div class="chk"><svg class="ckmark" width="11" height="11" viewBox="0 0 11 11" fill="none"><polyline points="2,5.5 4.5,8.5 9,2.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ibody"><span class="itext">Uber — gros carton sur les genoux</span></div></div>
+  </div>
+
+  <div style="margin-top: 20px;">
+  <div class="trajet-card">
+    <div class="trajet-body">
+      <div class="trajet-from"><div class="tloc-label">Départ</div><div class="tloc-name">Chez Lola</div></div>
+      <div class="trajet-mid"><div class="trajet-icon">🚗</div><div class="tbadge tbadge-uber">Uber</div></div>
+      <div class="trajet-to"><div class="tloc-label">Arrivée</div><div class="tloc-name">55 rue du Montparnasse</div><div class="tloc-sub">1 seul trajet</div></div>
     </div>
+    <div class="trajet-note">Carton sur les genoux — pas de second aller-retour</div>
   </div>
+  </div>
+
+  <div class="spacer"></div>
 </div>
 
-<!-- TRAJET 1 -->
-<div class="group-header" style="padding-top:14px;"><div class="gdot gdot-dim"></div><span class="g-time">8h50</span><span class="g-name">Trajet 1</span></div>
-<div class="trajet">
-  <div class="trajet-body">
-    <div class="trajet-from"><div class="tloc-label">Départ</div><div class="tloc-name">Chez Lola</div></div>
-    <div class="trajet-mid"><div class="trajet-icon">🚇</div><div class="tbadge tbadge-metro">Métro</div></div>
-    <div class="trajet-to"><div class="tloc-label">Arrivée</div><div class="tloc-name">Résidence Bouchor</div><div class="tloc-sub">9h30</div></div>
+<!-- ═══════════════════════════════════ PAGE 5 — INSTALLATION FINALE -->
+<div class="page" id="p4" data-label="Installation">
+
+  <div class="page-header">
+    <div class="page-eyebrow">Galerie Montparnasse · 2h / 3h</div>
+    <div class="page-title">Installation finale</div>
   </div>
-  <div class="trajet-note">Tote bag vert + sac de courses vide</div>
+
+  <div class="slabel">Accrochage</div>
+  <div class="items-wrap" id="items-4">
+    <div class="item" onclick="toggleItem(this,4)"><div class="chk"><svg class="ckmark" width="11" height="11" viewBox="0 0 11 11" fill="none"><polyline points="2,5.5 4.5,8.5 9,2.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ibody"><span class="itext">Sortir les œuvres soigneusement du carton</span><span class="itag itag-r">Fragile</span></div></div>
+    <div class="item" onclick="toggleItem(this,4)"><div class="chk"><svg class="ckmark" width="11" height="11" viewBox="0 0 11 11" fill="none"><polyline points="2,5.5 4.5,8.5 9,2.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ibody"><span class="itext">Poser le nuage de sol + carré de verre sur socle</span></div></div>
+    <div class="item" onclick="toggleItem(this,4)"><div class="chk"><svg class="ckmark" width="11" height="11" viewBox="0 0 11 11" fill="none"><polyline points="2,5.5 4.5,8.5 9,2.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ibody"><span class="itext">Installer Retenir le ciel (superposition des plaques)</span></div></div>
+    <div class="item" onclick="toggleItem(this,4)"><div class="chk"><svg class="ckmark" width="11" height="11" viewBox="0 0 11 11" fill="none"><polyline points="2,5.5 4.5,8.5 9,2.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ibody"><span class="itext">Coller la pièce argile au mur (double face + scotch de peintre)</span></div></div>
+    <div class="item" onclick="toggleItem(this,4)"><div class="chk"><svg class="ckmark" width="11" height="11" viewBox="0 0 11 11" fill="none"><polyline points="2,5.5 4.5,8.5 9,2.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ibody"><span class="itext">Découper et coller les cartels</span></div></div>
+    <div class="item" onclick="toggleItem(this,4)"><div class="chk"><svg class="ckmark" width="11" height="11" viewBox="0 0 11 11" fill="none"><polyline points="2,5.5 4.5,8.5 9,2.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ibody"><span class="itext">Vérification finale de tout l'accrochage</span><span class="itag itag-g">Check final</span></div></div>
+  </div>
+
+  <div class="spacer"></div>
 </div>
 
-<!-- BOUCHOR -->
-<div class="group" data-group="1">
-  <div class="group-header"><div class="gdot"></div><span class="g-time">9h30</span><span class="g-name">Résidence Bouchor</span></div>
-  <div class="bag-block">
-    <div class="bag-head"><span style="font-size:15px;">🛍</span><span class="bag-head-text">Sac de courses — à récupérer ici</span></div>
-    <div class="bag-pills">
-      <span class="pill" onclick="togglePill(this)">Marteau + clous</span>
-      <span class="pill" onclick="togglePill(this)">Enduit + pinceau</span>
-      <span class="pill" onclick="togglePill(this)">Planche à découper</span>
-      <span class="pill" onclick="togglePill(this)">Règles + cutters</span>
-      <span class="pill" onclick="togglePill(this)">Gaffer blanc</span>
-      <span class="pill" onclick="togglePill(this)">Serpillière</span>
-    </div>
-  </div>
-  <div class="inset-list">
-    <div class="item" data-grp="1" onclick="toggleItem(this)"><div class="check-circle"><svg class="checkmark" width="11" height="11" viewBox="0 0 11 11" fill="none"><polyline points="2,5.5 4.5,8.5 9,2.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ibody"><span class="itext">3 socles blancs + bâche de protection</span><span class="itag itag-yellow">Peinture</span></div></div>
-    <div class="item" data-grp="1" onclick="toggleItem(this)"><div class="check-circle"><svg class="checkmark" width="11" height="11" viewBox="0 0 11 11" fill="none"><polyline points="2,5.5 4.5,8.5 9,2.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ibody"><span class="itext">Écran + alimentation</span></div></div>
-    <div class="item" data-grp="1" onclick="toggleItem(this)"><div class="check-circle"><svg class="checkmark" width="11" height="11" viewBox="0 0 11 11" fill="none"><polyline points="2,5.5 4.5,8.5 9,2.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ibody"><span class="itext">Petite table blanche cassée</span></div></div>
-    <div class="item" data-grp="1" onclick="toggleItem(this)"><div class="check-circle"><svg class="checkmark" width="11" height="11" viewBox="0 0 11 11" fill="none"><polyline points="2,5.5 4.5,8.5 9,2.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ibody"><span class="itext">Voir ce qu'Ada amène — si trop : 2 Uber</span><span class="itag itag-blue">Coord.</span></div></div>
-  </div>
-</div>
-
-<!-- TRAJET 2 -->
-<div class="group-header" style="padding-top:14px;"><div class="gdot gdot-dim"></div><span class="g-name">Trajet 2</span></div>
-<div class="trajet">
-  <div class="trajet-body">
-    <div class="trajet-from"><div class="tloc-label">Départ</div><div class="tloc-name">Résidence Bouchor</div></div>
-    <div class="trajet-mid"><div class="trajet-icon">🚐</div><div class="tbadge tbadge-uber">Uber Van</div></div>
-    <div class="trajet-to"><div class="tloc-label">Arrivée</div><div class="tloc-name">Galerie Montparnasse</div><div class="tloc-sub">55 rue du Montparnasse</div></div>
-  </div>
-  <div class="trajet-note">Socles + écran + table — ~10h30/11h</div>
-</div>
-
-<!-- GALERIE 1er PASSAGE -->
-<div class="group" data-group="2">
-  <div class="group-header"><div class="gdot gdot-blue"></div><span class="g-time">10h30 / 11h</span><span class="g-name">Galerie — 1er passage</span></div>
-  <div class="inset-list">
-    <div class="item" data-grp="2" onclick="toggleItem(this)"><div class="check-circle"><svg class="checkmark" width="11" height="11" viewBox="0 0 11 11" fill="none"><polyline points="2,5.5 4.5,8.5 9,2.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ibody"><span class="itext">Déposer et positionner les socles</span></div></div>
-    <div class="item" data-grp="2" onclick="toggleItem(this)"><div class="check-circle"><svg class="checkmark" width="11" height="11" viewBox="0 0 11 11" fill="none"><polyline points="2,5.5 4.5,8.5 9,2.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ibody"><span class="itext">Nettoyer sol + vitres</span></div></div>
-    <div class="item" data-grp="2" onclick="toggleItem(this)"><div class="check-circle"><svg class="checkmark" width="11" height="11" viewBox="0 0 11 11" fill="none"><polyline points="2,5.5 4.5,8.5 9,2.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ibody"><span class="itext">Installer écran + clé USB + tester son et image</span><span class="itag itag-red">Test</span></div></div>
-    <div class="item" data-grp="2" onclick="toggleItem(this)"><div class="check-circle"><svg class="checkmark" width="11" height="11" viewBox="0 0 11 11" fill="none"><polyline points="2,5.5 4.5,8.5 9,2.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ibody"><span class="itext">Si ça ne fonctionne pas : retour 13 passage Courtois 75011</span><span class="itag itag-blue">Plan B</span></div></div>
-  </div>
-</div>
-
-<!-- TRAJET 3 -->
-<div class="group-header" style="padding-top:14px;"><div class="gdot gdot-dim"></div><span class="g-name">Trajet 3 — récupérer les œuvres</span></div>
-<div class="trajet" style="margin-bottom:1px;">
-  <div class="trajet-body">
-    <div class="trajet-from"><div class="tloc-label">Départ</div><div class="tloc-name">Galerie</div></div>
-    <div class="trajet-mid"><div class="trajet-icon">🚗</div><div class="tbadge tbadge-uber">Uber</div></div>
-    <div class="trajet-to"><div class="tloc-label">Arrivée</div><div class="tloc-name">Chez Lola</div><div class="tloc-sub">Récupérer les œuvres</div></div>
-  </div>
-  <div class="trajet-note">Vérifier chaque boîte plexiglas avant de partir</div>
-</div>
-<div class="trajet">
-  <div class="trajet-body">
-    <div class="trajet-from"><div class="tloc-label">Départ</div><div class="tloc-name">Chez Lola</div></div>
-    <div class="trajet-mid"><div class="trajet-icon">🚗</div><div class="tbadge tbadge-uber">Uber</div></div>
-    <div class="trajet-to"><div class="tloc-label">Arrivée</div><div class="tloc-name">55 rue du Montparnasse</div></div>
-  </div>
-  <div class="trajet-note">Gros carton sur les genoux — 1 seul trajet</div>
-</div>
-
-<!-- INSTALLATION FINALE -->
-<div class="group" data-group="3">
-  <div class="group-header"><div class="gdot gdot-blue"></div><span class="g-name">Installation finale — 2h / 3h</span></div>
-  <div class="inset-list">
-    <div class="item" data-grp="3" onclick="toggleItem(this)"><div class="check-circle"><svg class="checkmark" width="11" height="11" viewBox="0 0 11 11" fill="none"><polyline points="2,5.5 4.5,8.5 9,2.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ibody"><span class="itext">Sortir les œuvres soigneusement du carton</span><span class="itag itag-red">Fragile</span></div></div>
-    <div class="item" data-grp="3" onclick="toggleItem(this)"><div class="check-circle"><svg class="checkmark" width="11" height="11" viewBox="0 0 11 11" fill="none"><polyline points="2,5.5 4.5,8.5 9,2.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ibody"><span class="itext">Poser le nuage de sol + carré de verre sur socle</span></div></div>
-    <div class="item" data-grp="3" onclick="toggleItem(this)"><div class="check-circle"><svg class="checkmark" width="11" height="11" viewBox="0 0 11 11" fill="none"><polyline points="2,5.5 4.5,8.5 9,2.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ibody"><span class="itext">Installer Retenir le ciel (superposition des plaques)</span></div></div>
-    <div class="item" data-grp="3" onclick="toggleItem(this)"><div class="check-circle"><svg class="checkmark" width="11" height="11" viewBox="0 0 11 11" fill="none"><polyline points="2,5.5 4.5,8.5 9,2.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ibody"><span class="itext">Coller la pièce argile au mur (double face + scotch de peintre)</span></div></div>
-    <div class="item" data-grp="3" onclick="toggleItem(this)"><div class="check-circle"><svg class="checkmark" width="11" height="11" viewBox="0 0 11 11" fill="none"><polyline points="2,5.5 4.5,8.5 9,2.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ibody"><span class="itext">Découper et coller les cartels</span></div></div>
-    <div class="item" data-grp="3" onclick="toggleItem(this)"><div class="check-circle"><svg class="checkmark" width="11" height="11" viewBox="0 0 11 11" fill="none"><polyline points="2,5.5 4.5,8.5 9,2.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ibody"><span class="itext">Vérification finale de tout l'accrochage</span><span class="itag itag-green">Check final</span></div></div>
-  </div>
-</div>
-
-<div class="spacer"></div>
-
-<!-- BOTTOM BAR -->
+<!-- BOTTOM NAV -->
 <div class="bottom">
-  <div class="bot-left">
-    <div class="bot-sublabel">Tâches cochées</div>
-    <div class="bot-count" id="bot-count">0 / 0</div>
-  </div>
-  <button class="reset-btn" onclick="resetAll()">Réinitialiser</button>
+  <button class="btn-back" id="btn-back" onclick="goBack()" style="visibility:hidden;">← Retour</button>
+  <button class="btn-next" id="btn-next" onclick="goNext()">Suivant →</button>
 </div>
 
 <script>
-  // date
-  document.getElementById('nav-date').textContent =
-    new Date().toLocaleDateString('fr-FR', { weekday:'short', day:'numeric', month:'short' });
+  const PAGES = 5;
+  const LABELS = ['Préparation','Bouchor','Galerie','Œuvres','Installation'];
+  let cur = 0;
 
-  // group item counts (unused now but kept for reference)
-  
-  function update() {
-    const all   = document.querySelectorAll('.item');
-    const done  = document.querySelectorAll('.item.done');
-    const total = all.length;
-    const pct   = total ? Math.round((done.length / total) * 100) : 0;
+  // per-page item counts
+  const pageDone  = [0, 0, 0, 0, 0];
+  const pageTotal = [0, 0, 0, 0, 0];
 
-    document.getElementById('pb-pct').textContent   = pct + '%';
-    document.getElementById('pb-count').textContent = done.length + ' / ' + total + ' tâches';
-    document.getElementById('pb-fill').style.width  = pct + '%';
-    document.getElementById('bot-count').textContent = done.length + ' / ' + total;
-
-    // ring (r=9, circ=56.5)
-    const CIRC = 56.5;
-    const offset = CIRC * (1 - pct / 100);
-    document.getElementById('ring-fill').setAttribute('stroke-dashoffset', offset.toFixed(2));
+  function init() {
+    for (let i = 1; i <= 4; i++) {
+      const els = document.querySelectorAll(`#items-${i} .item`);
+      pageTotal[i] = els.length;
+    }
+    render();
   }
 
-  function toggleItem(el) {
+  function countPageItems(p) {
+    if (p === 0) return; // pills only, no count
+    const done = document.querySelectorAll(`#items-${p} .item.done`).length;
+    pageDone[p] = done;
+  }
+
+  function totalDone() {
+    let d = 0, t = 0;
+    for (let i = 1; i <= 4; i++) { d += pageDone[i]; t += pageTotal[i]; }
+    return { d, t };
+  }
+
+  function render() {
+    // pages
+    document.querySelectorAll('.page').forEach((el, i) => {
+      el.classList.toggle('active', i === cur);
+    });
+
+    // nav step
+    document.getElementById('nav-step').textContent = (cur + 1) + ' / ' + PAGES;
+
+    // dots
+    document.querySelectorAll('.pdot').forEach((dot, i) => {
+      dot.classList.remove('active','done');
+      if (i < cur)      dot.classList.add('done');
+      else if (i === cur) dot.classList.add('active');
+    });
+
+    // label
+    document.getElementById('pbar-label').textContent = LABELS[cur];
+
+    // global progress
+    const { d, t } = totalDone();
+    const pct = t ? Math.round(d / t * 100) : 0;
+    document.getElementById('pbar-pct').textContent = pct + '%';
+    document.getElementById('pbar-fill').style.width = pct + '%';
+
+    // back btn
+    const back = document.getElementById('btn-back');
+    back.style.visibility = cur === 0 ? 'hidden' : 'visible';
+
+    // next btn
+    const next = document.getElementById('btn-next');
+    if (cur === PAGES - 1) {
+      next.textContent = '🎉 Vernissage prêt';
+      next.classList.add('final');
+      next.classList.remove('disabled');
+    } else {
+      next.textContent = 'Suivant →';
+      next.classList.remove('final');
+      next.classList.remove('disabled');
+    }
+  }
+
+  function goNext() {
+    if (cur === PAGES - 1) {
+      document.querySelector('.page.active').innerHTML =
+        '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:16px;padding:40px 20px;">' +
+        '<div style="font-size:64px;line-height:1;">🎉</div>' +
+        '<div style="font-size:28px;font-weight:700;letter-spacing:-0.56px;color:var(--white);text-align:center;">Vernissage prêt</div>' +
+        '<div style="font-size:17px;color:var(--hint);text-align:center;letter-spacing:-0.41px;">Bravo Lola.</div>' +
+        '</div>';
+      document.getElementById('btn-next').style.display = 'none';
+      document.getElementById('btn-back').style.visibility = 'hidden';
+      return;
+    }
+    const next = document.getElementById('p' + (cur + 1));
+    next.classList.remove('back');
+    cur++;
+    render();
+    window.scrollTo(0, 0);
+  }
+
+  function goBack() {
+    if (cur === 0) return;
+    const prev = document.getElementById('p' + (cur - 1));
+    prev.classList.add('back');
+    cur--;
+    render();
+    window.scrollTo(0, 0);
+  }
+
+  function toggleItem(el, page) {
     el.classList.toggle('done');
-    update();
-  }
-  function togglePill(el) {
-    el.classList.toggle('done');
-  }
-  function resetAll() {
-    document.querySelectorAll('.item.done').forEach(e => e.classList.remove('done'));
-    document.querySelectorAll('.pill.done').forEach(e => e.classList.remove('done'));
-    update();
+    countPageItems(page);
+    render();
   }
 
-  update();
+  function togglePill(el, page) {
+    el.classList.toggle('done');
+  }
+
+  init();
 </script>
 </body>
 </html>
