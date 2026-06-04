@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Expo Lola">
+<title>Exposition Lola</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --black:      #000000;
+  --t1:         #1c1c1e;
+  --t2:         #2c2c2e;
+  --t3:         #3a3a3c;
+  --white:      #ffffff;
+  --muted:      #ebebf5;
+  --hint:       rgba(235,235,245,0.6);
+  --hint2:      rgba(235,235,245,0.3);
+  --sep:        rgba(84,84,88,0.65);
+  --blue:       #0a84ff;
+  --red:        #ff453a;
+  --green:      #30d158;
+  --yellow:     #ffd60a;
+  --safe-top:   env(safe-area-inset-top, 44px);
+  --safe-bot:   env(safe-area-inset-bottom, 34px);
+  --nav-h:      44px;
+}
+
+html, body {
+  background: var(--black);
+  color: var(--white);
+  font-family: -apple-system, "SF Pro Text", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  height: 100%;
+}
+
+body {
+  padding-top: calc(var(--safe-top) + var(--nav-h) + 92px); /* nav + hero progress card */
+  padding-bottom: calc(var(--safe-bot) + 72px);
+  overflow-x: hidden;
+}
+
+/* ─── NAV ─── */
+.nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 300;
+  padding-top: var(--safe-top);
+  background: rgba(28,28,30,0.85);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-bottom: 0.5px solid var(--sep);
+}
+.nav-inner {
+  height: var(--nav-h);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 20px;
+}
+.nav-title {
+  font-size: 17px; font-weight: 600; letter-spacing: -0.41px;
+  color: var(--white);
+}
+.nav-sub { font-size: 13px; font-weight: 400; letter-spacing: -0.08px; color: var(--hint); }
+
+/* ─── HERO PROGRESS CARD ─── */
+.hero-card {
+  position: fixed;
+  top: calc(var(--safe-top) + var(--nav-h));
+  left: 0; right: 0; z-index: 200;
+  background: rgba(28,28,30,0.85);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-bottom: 0.5px solid var(--sep);
+  padding: 14px 20px 16px;
+}
+.hero-meta {
+  display: flex; align-items: baseline; justify-content: space-between;
+  margin-bottom: 10px;
+}
+.hero-label { font-size: 13px; font-weight: 400; letter-spacing: -0.08px; color: var(--hint); }
+.hero-pct {
+  font-size: 28px; font-weight: 700; letter-spacing: -0.56px;
+  color: var(--white); line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.hero-count { font-size: 13px; color: var(--hint); letter-spacing: -0.08px; }
+
+/* Ring progress */
+.ring-row { display: flex; align-items: center; gap: 14px; }
+.ring-wrap { flex-shrink: 0; }
+svg.ring { transform: rotate(-90deg); }
+.ring-bg { fill: none; stroke: var(--t3); }
+.ring-fill {
+  fill: none; stroke: var(--blue);
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.5s cubic-bezier(0.4,0,0.2,1);
+}
+
+/* Segments bar */
+.segments-bar {
+  flex: 1; display: flex; flex-direction: column; gap: 6px;
+}
+.seg-row { display: flex; align-items: center; gap: 8px; }
+.seg-label { font-size: 11px; font-weight: 400; color: var(--hint2); width: 80px; flex-shrink: 0; letter-spacing: -0.08px; }
+.seg-track {
+  flex: 1; height: 4px; background: var(--t3); border-radius: 2px; overflow: hidden;
+}
+.seg-fill {
+  height: 100%; border-radius: 2px;
+  transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+}
+.seg-fill.c-blue  { background: var(--blue); }
+.seg-fill.c-green { background: var(--green); }
+.seg-fill.c-red   { background: var(--red); }
+.seg-fill.c-gray  { background: var(--t3); }
+
+/* ─── WARN ─── */
+.warn-band {
+  background: rgba(255,69,58,0.1);
+  padding: 12px 20px;
+  display: flex; align-items: flex-start; gap: 10px;
+  border-bottom: 0.5px solid rgba(255,69,58,0.2);
+}
+.warn-text { font-size: 13px; font-weight: 400; letter-spacing: -0.08px; color: var(--red); line-height: 1.4; }
+
+/* ─── OEUVRES ─── */
+.oeuvres-wrap { background: var(--t1); padding: 16px 0 20px; }
+.section-eyebrow {
+  font-size: 13px; font-weight: 400; letter-spacing: -0.08px; color: var(--hint);
+  padding: 0 20px; margin-bottom: 12px;
+}
+.oeuvres-scroll {
+  display: flex; gap: 10px;
+  padding: 0 20px;
+  overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none;
+}
+.oeuvres-scroll::-webkit-scrollbar { display: none; }
+.oeuvre-card {
+  flex-shrink: 0; width: 136px;
+  background: var(--t2); border-radius: 12px;
+  padding: 13px 13px 14px;
+}
+.oeuvre-name {
+  font-size: 13px; font-weight: 600; letter-spacing: -0.08px;
+  color: var(--white); margin-bottom: 5px; line-height: 1.3;
+}
+.oeuvre-desc { font-size: 11px; font-weight: 400; letter-spacing: -0.07px; line-height: 1.45; color: var(--hint); }
+
+/* ─── GROUP HEADER ─── */
+.group { background: var(--black); }
+.group-header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 22px 20px 8px;
+}
+.gdot { width: 7px; height: 7px; border-radius: 50%; background: var(--white); flex-shrink: 0; }
+.gdot-dim { background: var(--hint2); }
+.gdot-blue { background: var(--blue); }
+.g-time { font-size: 13px; font-weight: 400; letter-spacing: -0.08px; color: var(--hint); white-space: nowrap; }
+.g-name { font-size: 17px; font-weight: 600; letter-spacing: -0.41px; color: var(--white); flex: 1; }
+
+/* ─── BAG BLOCK ─── */
+.bag-block { background: var(--t1); margin: 0 0 1px; }
+.bag-head {
+  display: flex; align-items: center; gap: 8px;
+  padding: 12px 20px 10px;
+  border-bottom: 0.5px solid var(--sep);
+}
+.bag-head-text { font-size: 13px; font-weight: 600; letter-spacing: -0.08px; color: var(--white); }
+.bag-pills { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 20px 16px; }
+.pill {
+  font-size: 15px; font-weight: 400; letter-spacing: -0.24px;
+  padding: 7px 16px; border-radius: 9999px;
+  border: 1px solid var(--sep);
+  color: var(--white); background: transparent;
+  cursor: pointer; user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.1s, opacity 0.15s;
+}
+.pill:active { transform: scale(0.95); }
+.pill.done { opacity: 0.3; text-decoration: line-through; }
+.pill.critical { border-color: var(--red); color: var(--red); }
+.pill.critical.done { border-color: var(--sep); color: var(--hint2); }
+
+/* ─── TRAJET ─── */
+.trajet { background: var(--t1); margin: 0 0 1px; }
+.trajet-body { display: flex; align-items: stretch; }
+.trajet-from, .trajet-to { flex: 1; padding: 14px 16px; }
+.trajet-from { border-right: 0.5px solid var(--sep); }
+.tloc-label {
+  font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 0.05em;
+  color: var(--hint2); margin-bottom: 4px;
+}
+.tloc-name { font-size: 15px; font-weight: 600; letter-spacing: -0.24px; color: var(--white); line-height: 1.3; }
+.tloc-sub { font-size: 12px; color: var(--hint); margin-top: 2px; letter-spacing: -0.07px; }
+.trajet-mid {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 0 14px; gap: 5px; flex-shrink: 0;
+}
+.trajet-icon { font-size: 22px; line-height: 1; }
+.tbadge {
+  font-size: 11px; font-weight: 400; letter-spacing: 0.03em;
+  text-transform: uppercase; padding: 3px 9px; border-radius: 9999px; white-space: nowrap;
+}
+.tbadge-metro { background: rgba(10,132,255,0.18); color: var(--blue); }
+.tbadge-uber  { background: rgba(48,209,88,0.14); color: var(--green); }
+.trajet-note {
+  padding: 9px 20px; border-top: 0.5px solid var(--sep);
+  font-size: 12px; color: var(--hint); letter-spacing: -0.07px;
+  background: rgba(44,44,46,0.6);
+}
+
+/* ─── ITEMS LIST ─── */
+.inset-list { background: var(--t1); }
+.item {
+  display: flex; align-items: flex-start; gap: 14px;
+  padding: 13px 20px;
+  border-bottom: 0.5px solid var(--sep);
+  cursor: pointer; user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.1s;
+}
+.item:last-child { border-bottom: none; }
+.item:active { background: var(--t2); }
+.item.done .itext { text-decoration: line-through; color: var(--hint2); }
+.check-circle {
+  width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0; margin-top: 1px;
+  border: 1.5px solid var(--t3);
+  background: transparent;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.18s cubic-bezier(0.4,0,0.2,1);
+}
+.item.done .check-circle { background: var(--blue); border-color: var(--blue); }
+.checkmark { display: none; }
+.item.done .checkmark { display: block; }
+.ibody { flex: 1; display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.itext { font-size: 17px; font-weight: 400; letter-spacing: -0.41px; line-height: 1.47; color: var(--white); flex: 1; }
+.itag {
+  font-size: 11px; font-weight: 400; letter-spacing: -0.07px;
+  padding: 3px 9px; border-radius: 9999px; white-space: nowrap;
+  flex-shrink: 0; align-self: flex-start; margin-top: 3px;
+}
+.itag-red    { background: rgba(255,69,58,0.15);  color: var(--red); }
+.itag-blue   { background: rgba(10,132,255,0.15); color: var(--blue); }
+.itag-green  { background: rgba(48,209,88,0.14);  color: var(--green); }
+.itag-yellow { background: rgba(255,214,10,0.14); color: var(--yellow); }
+
+/* ─── BOTTOM ─── */
+.bottom {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 300;
+  background: rgba(28,28,30,0.88);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-top: 0.5px solid var(--sep);
+  padding: 12px 20px calc(12px + var(--safe-bot));
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+}
+.bot-left {}
+.bot-sublabel { font-size: 12px; color: var(--hint); letter-spacing: -0.07px; }
+.bot-count { font-size: 17px; font-weight: 600; letter-spacing: -0.41px; color: var(--white); }
+.reset-btn {
+  font-family: -apple-system, "SF Pro Text", system-ui, sans-serif;
+  font-size: 15px; font-weight: 400; letter-spacing: -0.24px;
+  padding: 9px 20px; border-radius: 9999px;
+  border: 1px solid var(--sep);
+  background: transparent; color: var(--blue);
+  cursor: pointer; -webkit-tap-highlight-color: transparent;
+  transition: transform 0.1s;
+}
+.reset-btn:active { transform: scale(0.95); background: rgba(255,255,255,0.05); }
+
+.spacer { height: 32px; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-inner">
+    <span class="nav-title">Exposition Lola</span>
+    <span class="nav-sub" id="nav-date"></span>
+  </div>
+</nav>
+
+<!-- HERO PROGRESS CARD -->
+<div class="hero-card" id="hero-card">
+  <div class="hero-meta">
+    <div>
+      <div class="hero-label">Progression</div>
+      <div style="display:flex;align-items:baseline;gap:8px;margin-top:2px;">
+        <span class="hero-pct" id="hero-pct">0<span style="font-size:18px;font-weight:400;letter-spacing:0;color:var(--hint);">%</span></span>
+        <span class="hero-count" id="hero-count">0 / 0 tâches</span>
+      </div>
+    </div>
+    <div class="ring-wrap">
+      <svg class="ring" width="52" height="52" viewBox="0 0 52 52">
+        <circle class="ring-bg" cx="26" cy="26" r="22" stroke-width="4"/>
+        <circle class="ring-fill" id="ring-fill" cx="26" cy="26" r="22" stroke-width="4"
+          stroke-dasharray="138.2" stroke-dashoffset="138.2"/>
+      </svg>
+    </div>
+  </div>
+  <div class="segments-bar" id="seg-bar">
+    <div class="seg-row"><span class="seg-label">Préparation</span><div class="seg-track"><div class="seg-fill c-blue" id="seg0" style="width:0%"></div></div></div>
+    <div class="seg-row"><span class="seg-label">Bouchor</span><div class="seg-track"><div class="seg-fill c-green" id="seg1" style="width:0%"></div></div></div>
+    <div class="seg-row"><span class="seg-label">Galerie</span><div class="seg-track"><div class="seg-fill c-red" id="seg2" style="width:0%"></div></div></div>
+    <div class="seg-row"><span class="seg-label">Installation</span><div class="seg-track"><div class="seg-fill c-gray" id="seg3" style="width:0%"></div></div></div>
+  </div>
+</div>
+
+<!-- WARN -->
+<div class="warn-band">
+  <span style="font-size:14px;flex-shrink:0;margin-top:1px;">⚠️</span>
+  <span class="warn-text">Œuvres extrêmement fragiles — aigrettes de pissenlit. Pas de vent, pas de choc.</span>
+</div>
+
+<!-- OEUVRES -->
+<div class="oeuvres-wrap">
+  <div class="section-eyebrow">Les 4 œuvres</div>
+  <div class="oeuvres-scroll">
+    <div class="oeuvre-card"><div class="oeuvre-name">Le nuage de sol</div><div class="oeuvre-desc">Caillou + pissenlits, boîte plexiglas 10×10 cm</div></div>
+    <div class="oeuvre-card"><div class="oeuvre-name">Carré de verre</div><div class="oeuvre-desc">Verre + papier + pissenlits, grande boîte 30×30 cm</div></div>
+    <div class="oeuvre-card"><div class="oeuvre-name">Retenir le ciel</div><div class="oeuvre-desc">Plaques de verre superposées, 15×5×10 cm</div></div>
+    <div class="oeuvre-card"><div class="oeuvre-name">Bâtons de pluies</div><div class="oeuvre-desc">Écran TV + clé USB, son direct</div></div>
+  </div>
+</div>
+
+<!-- 8H — REVEIL -->
+<div class="group" data-group="0">
+  <div class="group-header"><div class="gdot"></div><span class="g-time">8h00</span><span class="g-name">Réveil — préparer les sacs</span></div>
+  <div class="bag-block">
+    <div class="bag-head"><span style="font-size:15px;">🟢</span><span class="bag-head-text">Tote bag Yves Rocher vert</span></div>
+    <div class="bag-pills">
+      <span class="pill" onclick="togglePill(this)">Ciseaux</span>
+      <span class="pill" onclick="togglePill(this)">Pâte à fixe</span>
+      <span class="pill" onclick="togglePill(this)">Chiffons propres</span>
+      <span class="pill" onclick="togglePill(this)">Produit vitres</span>
+      <span class="pill" onclick="togglePill(this)">Scotch</span>
+      <span class="pill" onclick="togglePill(this)">Double face</span>
+      <span class="pill" onclick="togglePill(this)">Multiprise</span>
+      <span class="pill critical" onclick="togglePill(this)">Clé USB Bâtons de pluies !</span>
+      <span class="pill" onclick="togglePill(this)">Sac de courses (vide)</span>
+    </div>
+  </div>
+</div>
+
+<!-- TRAJET 1 -->
+<div class="group-header" style="padding-top:14px;"><div class="gdot gdot-dim"></div><span class="g-time">8h50</span><span class="g-name">Trajet 1</span></div>
+<div class="trajet">
+  <div class="trajet-body">
+    <div class="trajet-from"><div class="tloc-label">Départ</div><div class="tloc-name">Chez Lola</div></div>
+    <div class="trajet-mid"><div class="trajet-icon">🚇</div><div class="tbadge tbadge-metro">Métro</div></div>
+    <div class="trajet-to"><div class="tloc-label">Arrivée</div><div class="tloc-name">Résidence Bouchor</div><div class="tloc-sub">9h30</div></div>
+  </div>
+  <div class="trajet-note">Tote bag vert + sac de courses vide</div>
+</div>
+
+<!-- BOUCHOR -->
+<div class="group" data-group="1">
+  <div class="group-header"><div class="gdot"></div><span class="g-time">9h30</span><span class="g-name">Résidence Bouchor</span></div>
+  <div class="bag-block">
+    <div class="bag-head"><span style="font-size:15px;">🛍</span><span class="bag-head-text">Sac de courses — à récupérer ici</span></div>
+    <div class="bag-pills">
+      <span class="pill" onclick="togglePill(this)">Marteau + clous</span>
+      <span class="pill" onclick="togglePill(this)">Enduit + pinceau</span>
+      <span class="pill" onclick="togglePill(this)">Planche à découper</span>
+      <span class="pill" onclick="togglePill(this)">Règles + cutters</span>
+      <span class="pill" onclick="togglePill(this)">Gaffer blanc</span>
+      <span class="pill" onclick="togglePill(this)">Serpillière</span>
+    </div>
+  </div>
+  <div class="inset-list">
+    <div class="item" data-grp="1" onclick="toggleItem(this)"><div class="check-circle"><svg class="checkmark" width="11" height="11" viewBox="0 0 11 11" fill="none"><polyline points="2,5.5 4.5,8.5 9,2.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ibody"><span class="itext">3 socles blancs + bâche de protection</span><span class="itag itag-yellow">Peinture</span></div></div>
+    <div class="item" data-grp="1" onclick="toggleItem(this)"><div class="check-circle"><svg class="checkmark" width="11" height="11" viewBox="0 0 11 11" fill="none"><polyline points="2,5.5 4.5,8.5 9,2.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ibody"><span class="itext">Écran + alimentation</span></div></div>
+    <div class="item" data-grp="1" onclick="toggleItem(this)"><div class="check-circle"><svg class="checkmark" width="11" height="11" viewBox="0 0 11 11" fill="none"><polyline points="2,5.5 4.5,8.5 9,2.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ibody"><span class="itext">Petite table blanche cassée</span></div></div>
+    <div class="item" data-grp="1" onclick="toggleItem(this)"><div class="check-circle"><svg class="checkmark" width="11" height="11" viewBox="0 0 11 11" fill="none"><polyline points="2,5.5 4.5,8.5 9,2.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ibody"><span class="itext">Voir ce qu'Ada amène — si trop : 2 Uber</span><span class="itag itag-blue">Coord.</span></div></div>
+  </div>
+</div>
+
+<!-- TRAJET 2 -->
+<div class="group-header" style="padding-top:14px;"><div class="gdot gdot-dim"></div><span class="g-name">Trajet 2</span></div>
+<div class="trajet">
+  <div class="trajet-body">
+    <div class="trajet-from"><div class="tloc-label">Départ</div><div class="tloc-name">Résidence Bouchor</div></div>
+    <div class="trajet-mid"><div class="trajet-icon">🚐</div><div class="tbadge tbadge-uber">Uber Van</div></div>
+    <div class="trajet-to"><div class="tloc-label">Arrivée</div><div class="tloc-name">Galerie Montparnasse</div><div class="tloc-sub">55 rue du Montparnasse</div></div>
+  </div>
+  <div class="trajet-note">Socles + écran + table — ~10h30/11h</div>
+</div>
+
+<!-- GALERIE 1er PASSAGE -->
+<div class="group" data-group="2">
+  <div class="group-header"><div class="gdot gdot-blue"></div><span class="g-time">10h30 / 11h</span><span class="g-name">Galerie — 1er passage</span></div>
+  <div class="inset-list">
+    <div class="item" data-grp="2" onclick="toggleItem(this)"><div class="check-circle"><svg class="checkmark" width="11" height="11" viewBox="0 0 11 11" fill="none"><polyline points="2,5.5 4.5,8.5 9,2.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ibody"><span class="itext">Déposer et positionner les socles</span></div></div>
+    <div class="item" data-grp="2" onclick="toggleItem(this)"><div class="check-circle"><svg class="checkmark" width="11" height="11" viewBox="0 0 11 11" fill="none"><polyline points="2,5.5 4.5,8.5 9,2.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ibody"><span class="itext">Nettoyer sol + vitres</span></div></div>
+    <div class="item" data-grp="2" onclick="toggleItem(this)"><div class="check-circle"><svg class="checkmark" width="11" height="11" viewBox="0 0 11 11" fill="none"><polyline points="2,5.5 4.5,8.5 9,2.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ibody"><span class="itext">Installer écran + clé USB + tester son et image</span><span class="itag itag-red">Test</span></div></div>
+    <div class="item" data-grp="2" onclick="toggleItem(this)"><div class="check-circle"><svg class="checkmark" width="11" height="11" viewBox="0 0 11 11" fill="none"><polyline points="2,5.5 4.5,8.5 9,2.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ibody"><span class="itext">Si ça ne fonctionne pas : retour 13 passage Courtois 75011</span><span class="itag itag-blue">Plan B</span></div></div>
+  </div>
+</div>
+
+<!-- TRAJET 3 -->
+<div class="group-header" style="padding-top:14px;"><div class="gdot gdot-dim"></div><span class="g-name">Trajet 3 — récupérer les œuvres</span></div>
+<div class="trajet" style="margin-bottom:1px;">
+  <div class="trajet-body">
+    <div class="trajet-from"><div class="tloc-label">Départ</div><div class="tloc-name">Galerie</div></div>
+    <div class="trajet-mid"><div class="trajet-icon">🚗</div><div class="tbadge tbadge-uber">Uber</div></div>
+    <div class="trajet-to"><div class="tloc-label">Arrivée</div><div class="tloc-name">Chez Lola</div><div class="tloc-sub">Récupérer les œuvres</div></div>
+  </div>
+  <div class="trajet-note">Vérifier chaque boîte plexiglas avant de partir</div>
+</div>
+<div class="trajet">
+  <div class="trajet-body">
+    <div class="trajet-from"><div class="tloc-label">Départ</div><div class="tloc-name">Chez Lola</div></div>
+    <div class="trajet-mid"><div class="trajet-icon">🚗</div><div class="tbadge tbadge-uber">Uber</div></div>
+    <div class="trajet-to"><div class="tloc-label">Arrivée</div><div class="tloc-name">55 rue du Montparnasse</div></div>
+  </div>
+  <div class="trajet-note">Gros carton sur les genoux — 1 seul trajet</div>
+</div>
+
+<!-- INSTALLATION FINALE -->
+<div class="group" data-group="3">
+  <div class="group-header"><div class="gdot gdot-blue"></div><span class="g-name">Installation finale — 2h / 3h</span></div>
+  <div class="inset-list">
+    <div class="item" data-grp="3" onclick="toggleItem(this)"><div class="check-circle"><svg class="checkmark" width="11" height="11" viewBox="0 0 11 11" fill="none"><polyline points="2,5.5 4.5,8.5 9,2.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ibody"><span class="itext">Sortir les œuvres soigneusement du carton</span><span class="itag itag-red">Fragile</span></div></div>
+    <div class="item" data-grp="3" onclick="toggleItem(this)"><div class="check-circle"><svg class="checkmark" width="11" height="11" viewBox="0 0 11 11" fill="none"><polyline points="2,5.5 4.5,8.5 9,2.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ibody"><span class="itext">Poser le nuage de sol + carré de verre sur socle</span></div></div>
+    <div class="item" data-grp="3" onclick="toggleItem(this)"><div class="check-circle"><svg class="checkmark" width="11" height="11" viewBox="0 0 11 11" fill="none"><polyline points="2,5.5 4.5,8.5 9,2.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ibody"><span class="itext">Installer Retenir le ciel (superposition des plaques)</span></div></div>
+    <div class="item" data-grp="3" onclick="toggleItem(this)"><div class="check-circle"><svg class="checkmark" width="11" height="11" viewBox="0 0 11 11" fill="none"><polyline points="2,5.5 4.5,8.5 9,2.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ibody"><span class="itext">Coller la pièce argile au mur (double face + scotch de peintre)</span></div></div>
+    <div class="item" data-grp="3" onclick="toggleItem(this)"><div class="check-circle"><svg class="checkmark" width="11" height="11" viewBox="0 0 11 11" fill="none"><polyline points="2,5.5 4.5,8.5 9,2.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ibody"><span class="itext">Découper et coller les cartels</span></div></div>
+    <div class="item" data-grp="3" onclick="toggleItem(this)"><div class="check-circle"><svg class="checkmark" width="11" height="11" viewBox="0 0 11 11" fill="none"><polyline points="2,5.5 4.5,8.5 9,2.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ibody"><span class="itext">Vérification finale de tout l'accrochage</span><span class="itag itag-green">Check final</span></div></div>
+  </div>
+</div>
+
+<div class="spacer"></div>
+
+<!-- BOTTOM BAR -->
+<div class="bottom">
+  <div class="bot-left">
+    <div class="bot-sublabel">Tâches cochées</div>
+    <div class="bot-count" id="bot-count">0 / 0</div>
+  </div>
+  <button class="reset-btn" onclick="resetAll()">Réinitialiser</button>
+</div>
+
+<script>
+  // date
+  document.getElementById('nav-date').textContent =
+    new Date().toLocaleDateString('fr-FR', { weekday:'short', day:'numeric', month:'short' });
+
+  // group item counts
+  const grpItems = { 0:0, 1:4, 2:4, 3:6 };
+  const grpKeys = ['seg0','seg1','seg2','seg3'];
+  const CIRC = 2 * Math.PI * 22;
+
+  function getGroupDone(g) {
+    return document.querySelectorAll(`.item[data-grp="${g}"].done`).length;
+  }
+  function getGroupTotal(g) {
+    return document.querySelectorAll(`.item[data-grp="${g}"]`).length;
+  }
+
+  function update() {
+    const all   = document.querySelectorAll('.item');
+    const done  = document.querySelectorAll('.item.done');
+    const total = all.length;
+    const pct   = total ? Math.round((done.length / total) * 100) : 0;
+
+    document.getElementById('hero-pct').childNodes[0].textContent = pct;
+    document.getElementById('hero-count').textContent = done.length + ' / ' + total + ' tâches';
+    document.getElementById('bot-count').textContent  = done.length + ' / ' + total;
+
+    // ring
+    const offset = CIRC * (1 - pct / 100);
+    document.getElementById('ring-fill').setAttribute('stroke-dashoffset', offset.toFixed(2));
+
+    // segments
+    [1,2,3].forEach(g => {
+      const tot = getGroupTotal(g);
+      const dn  = getGroupDone(g);
+      const w   = tot ? Math.round((dn / tot) * 100) : 0;
+      document.getElementById(grpKeys[g]).style.width = w + '%';
+    });
+  }
+
+  function toggleItem(el) {
+    el.classList.toggle('done');
+    update();
+  }
+  function togglePill(el) {
+    el.classList.toggle('done');
+  }
+  function resetAll() {
+    document.querySelectorAll('.item.done').forEach(e => e.classList.remove('done'));
+    document.querySelectorAll('.pill.done').forEach(e => e.classList.remove('done'));
+    update();
+  }
+
+  // adjust body-top padding to actual hero card height
+  window.addEventListener('load', () => {
+    const h = document.getElementById('hero-card').offsetHeight;
+    const navH = 44;
+    const st = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--safe-top')) || 44;
+    document.body.style.paddingTop = (st + navH + h) + 'px';
+  });
+
+  update();
+</script>
+</body>
+</html>
