@@ -38,7 +38,7 @@ html, body {
 }
 
 body {
-  padding-top: calc(var(--safe-top) + var(--nav-h) + 92px); /* nav + hero progress card */
+  padding-top: calc(var(--safe-top) + var(--nav-h) + 40px); /* nav + compact progress bar */
   padding-bottom: calc(var(--safe-bot) + 72px);
   overflow-x: hidden;
 }
@@ -63,57 +63,44 @@ body {
 }
 .nav-sub { font-size: 13px; font-weight: 400; letter-spacing: -0.08px; color: var(--hint); }
 
-/* ─── HERO PROGRESS CARD ─── */
-.hero-card {
+/* ─── COMPACT PROGRESS BAR ─── */
+.progress-bar {
   position: fixed;
   top: calc(var(--safe-top) + var(--nav-h));
   left: 0; right: 0; z-index: 200;
-  background: rgba(28,28,30,0.85);
+  height: 40px;
+  background: rgba(28,28,30,0.92);
   backdrop-filter: saturate(180%) blur(20px);
   -webkit-backdrop-filter: saturate(180%) blur(20px);
   border-bottom: 0.5px solid var(--sep);
-  padding: 14px 20px 16px;
+  display: flex; align-items: center;
+  padding: 0 20px; gap: 12px;
 }
-.hero-meta {
-  display: flex; align-items: baseline; justify-content: space-between;
-  margin-bottom: 10px;
-}
-.hero-label { font-size: 13px; font-weight: 400; letter-spacing: -0.08px; color: var(--hint); }
-.hero-pct {
-  font-size: 28px; font-weight: 700; letter-spacing: -0.56px;
-  color: var(--white); line-height: 1;
-  font-variant-numeric: tabular-nums;
-}
-.hero-count { font-size: 13px; color: var(--hint); letter-spacing: -0.08px; }
-
-/* Ring progress */
-.ring-row { display: flex; align-items: center; gap: 14px; }
-.ring-wrap { flex-shrink: 0; }
-svg.ring { transform: rotate(-90deg); }
+.pb-ring { flex-shrink: 0; }
+svg.ring { transform: rotate(-90deg); display: block; }
 .ring-bg { fill: none; stroke: var(--t3); }
 .ring-fill {
   fill: none; stroke: var(--blue);
   stroke-linecap: round;
   transition: stroke-dashoffset 0.5s cubic-bezier(0.4,0,0.2,1);
 }
-
-/* Segments bar */
-.segments-bar {
-  flex: 1; display: flex; flex-direction: column; gap: 6px;
+.pb-pct {
+  font-size: 13px; font-weight: 600; letter-spacing: -0.08px;
+  color: var(--white); min-width: 34px;
+  font-variant-numeric: tabular-nums;
 }
-.seg-row { display: flex; align-items: center; gap: 8px; }
-.seg-label { font-size: 11px; font-weight: 400; color: var(--hint2); width: 80px; flex-shrink: 0; letter-spacing: -0.08px; }
-.seg-track {
-  flex: 1; height: 4px; background: var(--t3); border-radius: 2px; overflow: hidden;
+.pb-track-wrap { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+.pb-track {
+  height: 3px; background: var(--t3); border-radius: 2px; overflow: hidden;
+  position: relative;
 }
-.seg-fill {
+.pb-fill {
   height: 100%; border-radius: 2px;
+  background: var(--blue);
   transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+  width: 0%;
 }
-.seg-fill.c-blue  { background: var(--blue); }
-.seg-fill.c-green { background: var(--green); }
-.seg-fill.c-red   { background: var(--red); }
-.seg-fill.c-gray  { background: var(--t3); }
+.pb-count { font-size: 11px; color: var(--hint2); letter-spacing: -0.07px; }
 
 /* ─── WARN ─── */
 .warn-band {
@@ -282,29 +269,19 @@ svg.ring { transform: rotate(-90deg); }
   </div>
 </nav>
 
-<!-- HERO PROGRESS CARD -->
-<div class="hero-card" id="hero-card">
-  <div class="hero-meta">
-    <div>
-      <div class="hero-label">Progression</div>
-      <div style="display:flex;align-items:baseline;gap:8px;margin-top:2px;">
-        <span class="hero-pct" id="hero-pct">0<span style="font-size:18px;font-weight:400;letter-spacing:0;color:var(--hint);">%</span></span>
-        <span class="hero-count" id="hero-count">0 / 0 tâches</span>
-      </div>
-    </div>
-    <div class="ring-wrap">
-      <svg class="ring" width="52" height="52" viewBox="0 0 52 52">
-        <circle class="ring-bg" cx="26" cy="26" r="22" stroke-width="4"/>
-        <circle class="ring-fill" id="ring-fill" cx="26" cy="26" r="22" stroke-width="4"
-          stroke-dasharray="138.2" stroke-dashoffset="138.2"/>
-      </svg>
-    </div>
+<!-- COMPACT PROGRESS BAR -->
+<div class="progress-bar" id="progress-bar">
+  <div class="pb-ring">
+    <svg class="ring" width="24" height="24" viewBox="0 0 24 24">
+      <circle class="ring-bg" cx="12" cy="12" r="9" stroke-width="2.5"/>
+      <circle class="ring-fill" id="ring-fill" cx="12" cy="12" r="9" stroke-width="2.5"
+        stroke-dasharray="56.5" stroke-dashoffset="56.5"/>
+    </svg>
   </div>
-  <div class="segments-bar" id="seg-bar">
-    <div class="seg-row"><span class="seg-label">Préparation</span><div class="seg-track"><div class="seg-fill c-blue" id="seg0" style="width:0%"></div></div></div>
-    <div class="seg-row"><span class="seg-label">Bouchor</span><div class="seg-track"><div class="seg-fill c-green" id="seg1" style="width:0%"></div></div></div>
-    <div class="seg-row"><span class="seg-label">Galerie</span><div class="seg-track"><div class="seg-fill c-red" id="seg2" style="width:0%"></div></div></div>
-    <div class="seg-row"><span class="seg-label">Installation</span><div class="seg-track"><div class="seg-fill c-gray" id="seg3" style="width:0%"></div></div></div>
+  <span class="pb-pct" id="pb-pct">0%</span>
+  <div class="pb-track-wrap">
+    <div class="pb-track"><div class="pb-fill" id="pb-fill"></div></div>
+    <span class="pb-count" id="pb-count">0 / 0 tâches</span>
   </div>
 </div>
 
@@ -447,39 +424,23 @@ svg.ring { transform: rotate(-90deg); }
   document.getElementById('nav-date').textContent =
     new Date().toLocaleDateString('fr-FR', { weekday:'short', day:'numeric', month:'short' });
 
-  // group item counts
-  const grpItems = { 0:0, 1:4, 2:4, 3:6 };
-  const grpKeys = ['seg0','seg1','seg2','seg3'];
-  const CIRC = 2 * Math.PI * 22;
-
-  function getGroupDone(g) {
-    return document.querySelectorAll(`.item[data-grp="${g}"].done`).length;
-  }
-  function getGroupTotal(g) {
-    return document.querySelectorAll(`.item[data-grp="${g}"]`).length;
-  }
-
+  // group item counts (unused now but kept for reference)
+  
   function update() {
     const all   = document.querySelectorAll('.item');
     const done  = document.querySelectorAll('.item.done');
     const total = all.length;
     const pct   = total ? Math.round((done.length / total) * 100) : 0;
 
-    document.getElementById('hero-pct').childNodes[0].textContent = pct;
-    document.getElementById('hero-count').textContent = done.length + ' / ' + total + ' tâches';
-    document.getElementById('bot-count').textContent  = done.length + ' / ' + total;
+    document.getElementById('pb-pct').textContent   = pct + '%';
+    document.getElementById('pb-count').textContent = done.length + ' / ' + total + ' tâches';
+    document.getElementById('pb-fill').style.width  = pct + '%';
+    document.getElementById('bot-count').textContent = done.length + ' / ' + total;
 
-    // ring
+    // ring (r=9, circ=56.5)
+    const CIRC = 56.5;
     const offset = CIRC * (1 - pct / 100);
     document.getElementById('ring-fill').setAttribute('stroke-dashoffset', offset.toFixed(2));
-
-    // segments
-    [1,2,3].forEach(g => {
-      const tot = getGroupTotal(g);
-      const dn  = getGroupDone(g);
-      const w   = tot ? Math.round((dn / tot) * 100) : 0;
-      document.getElementById(grpKeys[g]).style.width = w + '%';
-    });
   }
 
   function toggleItem(el) {
@@ -494,14 +455,6 @@ svg.ring { transform: rotate(-90deg); }
     document.querySelectorAll('.pill.done').forEach(e => e.classList.remove('done'));
     update();
   }
-
-  // adjust body-top padding to actual hero card height
-  window.addEventListener('load', () => {
-    const h = document.getElementById('hero-card').offsetHeight;
-    const navH = 44;
-    const st = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--safe-top')) || 44;
-    document.body.style.paddingTop = (st + navH + h) + 'px';
-  });
 
   update();
 </script>
